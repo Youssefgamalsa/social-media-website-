@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="./node_modules/axios/dist/axios.min.js"></script>
+</head>
+
+<body style="background:#f7f7f7">
+  <div class="lds-roller" id="loader" style="background:#777 ;text-align: center; opacity: .5; color:#000; cursor: pointer; position: absolute; top:50%;left:50%;z-index: 100; transform: translate(-50% , -50%);" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+
+    <!-- alert for user  -->
+    <div id="liveAlertPlaceholder" style="position: fixed; bottom: 20px; left:20px; width:300px;z-index: 10; "></div>
+    <!-- // alert for user //   -->
+
+    <!-- nav bar container  -->
+    <div class="container" id="nav">
+        <nav id="nav_width" class="col-9 m-auto shadow">
+            <ul>
+                <li><a class="text-info" style="margin-left: -2px;" href="index.html"> Facebook </a></li>
+                <li><a href="index.html"> home </a></li>
+                <li><a onclick="goprofilepage()" style="cursor: pointer;"> Profile </a></li>
+            </ul>
+            <div class="buttons">
+                <button type="button" id="login" class="btn btn-outline-success mx-3" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"> Login </button>
+                <button type="button" data-bs-toggle="modal" data-bs-target="#register-modal" id="register"
+                    class="btn btn-outline-success"> Register </button>
+                <div class="d-flex">
+                    <img class="user-img rounded-circle mx-1" src="">
+                    <b id="user-username" style="position: relative; top:10px">
+                    </b>
+                    <button type="button" id="logout" onclick="loginout()" class="btn btn-outline-danger"> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+
+    <!-- modal for create posts  -->
+
+    <div class="modal fade" id="createpost" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="create_post_title"> Create A New Post </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="post_title" class="col-form-label"> Title: </label>
+                            <input type="text" class="form-control" id="post_title">
+                        </div>
+                        <div class="mb-3">
+                            <label for="post_body" class="col-form-label"> Body: </label>
+                            <textarea class="form-control" id="post_body"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="post_image" class="col-form-label"> Image: </label>
+                            <input type="file" class="form-control" id="post_image">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="create_edit" type="button" id="close" class="btn btn-primary"
+                        onclick="createnewpost()">Create Post </button>
+                    <input type="hidden" id="hidden_input" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  // modal for create posts //  -->
+
+    <!-- // nav bar container //  -->
+
+    <!-- modal for delete  -->
+
+    <div class="modal fade" id="delete_post" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="create_post_title"> Are You Sure You Delete The Post </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="create_edit" type="button" class="btn btn-danger" onclick="deletepostclicked()">
+                        Yes,Delete </button>
+                    <input type="hidden" id="delete_hidden_input" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- // modal for delete  -->
+
+    <!-- Modal for login  -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel"> Login </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="Username" class="col-form-label">Username:</label>
+                            <input type="text" class="form-control" id="Username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="col-form-label">Password:</label>
+                            <input type="password" class="form-control" id="password">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="close" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="loginUsers()"> Login </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- // Modal for login //  -->
+
+    <!-- modal for register  -->
+    <div class="modal fade" id="register-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel"> Register A new User: </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="Register-name" class="col-form-label">name:</label>
+                            <input type="text" class="form-control" id="Register-name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="Register-Username" class="col-form-label">Username:</label>
+                            <input type="text" class="form-control" id="Register-Username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-password" class="col-form-label">Password:</label>
+                            <input type="password" class="form-control" id="register-password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-image" class="col-form-label">Profile image:</label>
+                            <input type="file" class="form-control" id="register-image">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="close1" class="btn btn-secondary" id="close2"
+                        data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="RegisterUsers()"> Register </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- // Modal For Register //  -->
+
+    <!-- Card For User  -->
+
+    <div class="container mt-4 pt-2" style="height:1000px;">
+        <div id="user-post" class="col-9 m-auto bg-white shadow p-2" style="cursor: pointer;">
+            <div class="row">
+                <div class="col-2 p-2">
+                    <img id="user_img" src="" style="margin-left:10px;width:120px ; height:120px; border-radius: 50%;">
+                </div>
+                <div class="col-4 p-3 d-flex flex-column justify-content-md-around "
+                    style="font-size:24px; font-weight:400; margin-left: 40px;">
+                    <div class="email mb-2">
+
+                    </div>
+                    <div class="name mb-2">
+
+                    </div>
+                    <div class="username mb-2">
+
+                    </div>
+                </div>
+                <div class="col-4 d-flex flex-column justify-content-around" id="post_comment">
+
+                    <div class="number_post">
+                        <span id="post_number"></span> Post
+                    </div>
+
+                    <div class="number_comments">
+                        <span id="comment_number"></span> Comment
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <h1 class="text-info col-9 m-auto mt-4 mb-4" id="youssef"> <span id="usernam"> </span> Posts </h1>
+
+        <div class="col-9 m-auto mt-2" id="users">
+
+        </div>
+
+    <!-- // Card For User // -->
+
+    <script src="popper.min.js"></script>
+    <script src="jquery-3.6.4.min.js"></script>
+    <script src="bootstrap.js"></script>
+    <script src="youssef.js"></script>
+    <script>
+
+
+
+        function createnewpost() {
+
+            let url = "";
+            load(true);
+            let postid = document.getElementById("hidden_input").value;
+            let is_create = postid == null || postid == "";
+
+            let token = localStorage.getItem("token");
+            let upload = document.querySelector("#post_image").files[0];
+            let postbody = document.querySelector("#post_body").value;
+            let posttitle = document.querySelector("#post_title").value;
+            let config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            };
+
+            let formdata = new FormData();
+            formdata.append("title", posttitle);
+            formdata.append("body", postbody);
+            formdata.append("image", upload);
+
+            if (is_create) {
+                url = `https://tarmeezacademy.com/api/v1/posts`;
+                axios
+                    .post(url, formdata, config)
+                    .then(function (response) {
+                        getposts();
+                        create(" Created New Post Successfully ", "success");
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        create(error.response.data.message, "danger");
+                    });
+            } else {
+                formdata.append("_method", "put");
+                url = `https://tarmeezacademy.com/api/v1/posts/${postid}`;
+                axios
+                    .post(url, formdata, config)
+                    .then(function (response) {
+                        getposts();
+                        create(" Edited New Post Successfully ", "success");
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        create(error.response.data.error_message, "danger");
+                    }).finally(function(){
+                        load(false)
+                    })
+            }
+        }
+
+
+        getuser()
+        function getuser() {
+            load(true)
+            let result = new URLSearchParams(window.location.search);
+            let userid = result.get('userid')
+            axios.get(`https://tarmeezacademy.com/api/v1/users/${userid}`).then(function (response) {
+                let data = response.data.data;
+                document.querySelector('.email').innerHTML = data.email;
+                document.querySelector('.name').innerHTML = data.name;
+                document.querySelector('.username').innerHTML = data.username;
+                document.querySelector('#post_number').innerHTML = data.posts_count;
+                document.querySelector('#comment_number').innerHTML = data.comments_count;
+                document.querySelector('#user_img').src = data.profile_image;
+                document.querySelector('#usernam').innerHTML = data.username;
+
+            }).catch(function (error) {
+                create('not done successfully', 'success');
+                console.log(error);
+            }).finally(function(){
+                load(false);
+            })
+        }
+
+        getposts();
+
+        function getposts() {
+            load(true)
+            let result = new URLSearchParams(window.location.search);
+            let userid = result.get('userid')
+            let users = document.querySelector('#users');
+            users.innerHTML = '';
+
+            axios
+                .get(`https://tarmeezacademy.com/api/v1/users/${userid}/posts`)
+                .then((response) => {
+                    let posts = response.data.data;
+                    for (post of posts) {
+                        let userauthor = null;
+                        if (localStorage.getItem("user")) {
+                            userauthor = JSON.parse(localStorage.getItem("user"));
+                        }
+                        let editbtncontent = ``;
+
+                        let isauthor = userauthor != null && userauthor.id == post.author.id;
+                        if (isauthor) {
+                            editbtncontent = `
+                                    <button class="btn btn-danger" id="deletebtn" style="float:right; margin-left:6px" onclick="deletepost(${post.id})" >Delete</button>
+                                    <button class="btn btn-secondary" id="editbtn" style="float:right" onclick="edit_function(${post.id})" >Edit</button>
+                                `;
+                        }
+
+                        let postTitle = "";
+                        if (post.title != null && post.title != "undefined") {
+                            postTitle = post.title;
+                        }
+                        if (typeof post.image == "string") {
+                            users.innerHTML += `
+                              <div class="card shadow-lg rounded mb-3" style="cursor: pointer;">
+                              <div class="card-header mx-1">
+                                 <!-- card-header  -->
+                                          <img src="${post.author.profile_image}" class="rounded-circle" style="width:60px; height:60px;">
+                                          <span>${post.author.username}</span>
+
+                                         ${editbtncontent}
+                                          </div>
+                                         <div class="card-body" onclick="Postdetail(${post.id})" >
+            
+                                         <h5 class="card-title">
+                                            <img src="${post.image}" style="width:100%;height:300px;">
+                                          </h5>
+                                          <h6 class="card-text">${postTitle}</h6>
+                                          <p class="text-dark">${post.body}</p>
+                                          <hr>
+                                          <span class="text-dark">
+                                            <i class="fa-solid fa-pen mx-2"></i>
+                                            <b> (${post.comments_count}) comments </b>
+                                          </span>
+                                      </div>
+                                       </div>
+             
+                              `;
+                        }
+                    }
+                });
+                load(false)
+        }
+        
+
+        window.onload = function () {
+            if (window.innerWidth < 995) {
+                document.querySelector('#youssef').classList.add('col-12');
+                document.querySelector('#users').classList.add('col-12');
+                document.getElementById("nav_width").classList.add("col-12");
+                document.getElementById("user-post").classList.add("col-12");
+                
+            }
+        };
+        window.addEventListener('resize', function () {
+            if (window.innerWidth < 995) {
+                document.querySelector('#youssef').classList.add('col-12');
+                document.querySelector('#users').classList.add('col-12');
+                document.getElementById("nav_width").classList.add("col-12");
+                document.getElementById("user-post").classList.add("col-12");
+            }
+        });
+    </script>
+
+
+
+
+</body>
+
+</html>
